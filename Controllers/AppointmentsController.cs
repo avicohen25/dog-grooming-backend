@@ -68,6 +68,7 @@ namespace DogGrooming.Controllers
         public List<GroupedAppointments> GroupedAppointments { get; set; }
     }
 
+
     public class GroupedAppointments
     {
         public string Date { get; set; }
