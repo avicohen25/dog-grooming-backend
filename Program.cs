@@ -1,11 +1,32 @@
+using DogGrooming.Managers.Contracts;
+using DogGrooming.Managers.Managers;
+using DogGrooming.Providers.Contracts;
+using DogGrooming.Providers.Providers;
 using DogGrooming.Utils;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 builder.Services.AddScoped<JwtService>();
+
+
+//Managers
+builder.Services.AddTransient<ILoginManager, LoginManager>();
+builder.Services.AddTransient<IAppointmentsManager, AppointmentsManager>();
+
+
+//Providers
+builder.Services.AddTransient<IGetUserProvider, GetUserProvider>();
+builder.Services.AddTransient<IInsertUserProvider, InsertUserProvider>();
+builder.Services.AddTransient<IGetUserByIdProvider, GetUserByIdProvider>();
+builder.Services.AddTransient<IGetAppointmentsProvider, GetAppointmentsProvider>();
+builder.Services.AddTransient<IGetHaircutTypesProvider, GetHaircutTypesProvider>();
+builder.Services.AddTransient<IAddAppointmentProvider, AddAppointmentProvider>();
+builder.Services.AddTransient<IUpdateAppointmentProvider, UpdateAppointmentProvider>();
+builder.Services.AddTransient<IDeleteAppointmentProvider, DeleteAppointmentProvider>();
 
 
 //-------------- Jwt --------------

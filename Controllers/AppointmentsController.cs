@@ -1,12 +1,8 @@
-using Dapper;
-using DogGrooming.Models;
+using DogGrooming.Managers.Contracts;
+using DogGrooming.Models.Request;
+using DogGrooming.Models.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using System.Data;
-using System.Globalization;
-using System.Linq;
-using System.Security.Claims;
 
 namespace DogGrooming.Controllers
 {
@@ -16,62 +12,69 @@ namespace DogGrooming.Controllers
     {
         private readonly ILogger<AppointmentsController> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IAppointmentsManager _appointmentsManager;
 
-        public AppointmentsController(ILogger<AppointmentsController> logger, IConfiguration configuration)
+        public AppointmentsController(ILogger<AppointmentsController> logger, IConfiguration configuration, IAppointmentsManager appointmentsManager)
         {
             _logger = logger;
             _configuration = configuration;
+            _appointmentsManager = appointmentsManager;
         }
+
 
         [Authorize]
         [HttpGet("GetAppointments")]
         public async Task<AppointmentsResponse> GetAppointments()
         {
-            Thread.Sleep(3000); //TODO:delete this
-
-            string connectionString = _configuration["ConnectionStrings:DogGrooming"];
-            using var conn = new SqlConnection(connectionString);
-
-            var result = await conn.QueryAsync<Appointment>(
-                "sp_getAppointments_select",
-                commandType: CommandType.StoredProcedure
-            );
-
-            List<Appointment> appointments = result.ToList();
-
-            foreach (var a in appointments)
-            {
-                a.DisplayHaircutDate = a.HaircutDate.ToString("dddd, dd MMMM yyyy", new CultureInfo("he-IL"));
-                a.DisplayHaircutTime = a.HaircutDate.ToString("HH:mm");
-            }
-
-            var grouped = appointments
-                .GroupBy(a => a.HaircutDate.Date)
-                .Select(g => new GroupedAppointments
-                {
-                    Date = g.Key.ToString("dddd, dd MMMM yyyy", new CultureInfo("he-IL")),
-                    Appointments = g.ToList()
-                })
-                .ToList();
-
-            AppointmentsResponse response = new AppointmentsResponse
-            {
-                GroupedAppointments = grouped
-            };
-
+            AppointmentsResponse response = await _appointmentsManager.GetAppointments();
             return response;
         }
-    }
-
-    public class AppointmentsResponse
-    {
-        public List<GroupedAppointments> GroupedAppointments { get; set; }
-    }
 
 
-    public class GroupedAppointments
-    {
-        public string Date { get; set; }
-        public List<Appointment> Appointments { get; set; }
+        [Authorize]
+        [HttpPost("GetAppointmentData")]
+        public async Task<GetAppointmentDataResponse> GetAppointmentData(GetAppointmentDataParams getAppointmentDataParams)
+        {
+            GetAppointmentDataResponse response = await _appointmentsManager.GetAppointmentData(getAppointmentDataParams);
+            return response;
+        }
+
+        [Authorize]
+        [HttpPost("AddAppointment")]
+        public async Task<AddAppointmentResponse> AddAppointment(AddAppointmentParams addAppointmentParams)
+        {
+            var userId = User.FindFirst("UserId")?.Value;
+            addAppointmentParams.userId = int.Parse(userId);
+
+            AddAppointmentResponse response = await _appointmentsManager.AddAppointment(addAppointmentParams);
+            return response;
+        }
+
+
+        [Authorize]
+        [HttpPost("UpdateAppointment")]
+        public async Task<AddAppointmentResponse> UpdateAppointment(UpdateAppointmentParams updateAppointmentParams)
+        {
+            var userId = User.FindFirst("UserId")?.Value;
+            updateAppointmentParams.userId = int.Parse(userId);
+
+            AddAppointmentResponse response = await _appointmentsManager.UpdateAppointment(updateAppointmentParams);
+            return response;
+        }
+
+
+        [Authorize]
+        [HttpPost("DeleteAppointment")]
+        public async Task<DeleteAppointmentResponse> DeleteAppointment(DeleteAppointmentParams deleteAppointmentParams)
+        {
+            var userId = User.FindFirst("UserId")?.Value;
+            deleteAppointmentParams.userId = int.Parse(userId);
+
+            DeleteAppointmentResponse response = await _appointmentsManager.DeleteAppointment(deleteAppointmentParams);
+            return response;
+        }
+
+
     }
+
 }
