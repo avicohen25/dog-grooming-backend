@@ -5,7 +5,7 @@ namespace DogGrooming.Managers.Contracts
 {
     public interface IAppointmentsManager
     {
-        Task<AppointmentsResponse> GetAppointments();
+        Task<AppointmentsResponse> GetAppointments(GetAppointmentsParams getAppointmentsParams);
         Task<GetAppointmentDataResponse> GetAppointmentData(GetAppointmentDataParams getAppointmentDataParams);
         Task<AddAppointmentResponse> AddAppointment(AddAppointmentParams addAppointmentParams);
         Task<AddAppointmentResponse> UpdateAppointment(UpdateAppointmentParams updateAppointmentParams);

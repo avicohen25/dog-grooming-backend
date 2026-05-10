@@ -23,10 +23,10 @@ namespace DogGrooming.Controllers
 
 
         [Authorize]
-        [HttpGet("GetAppointments")]
-        public async Task<AppointmentsResponse> GetAppointments()
+        [HttpPost("GetAppointments")]
+        public async Task<AppointmentsResponse> GetAppointments(GetAppointmentsParams getAppointmentsParams)
         {
-            AppointmentsResponse response = await _appointmentsManager.GetAppointments();
+            AppointmentsResponse response = await _appointmentsManager.GetAppointments(getAppointmentsParams);
             return response;
         }
 

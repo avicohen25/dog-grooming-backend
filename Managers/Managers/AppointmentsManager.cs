@@ -27,9 +27,9 @@ namespace DogGrooming.Managers.Managers
         }
 
 
-        public async Task<AppointmentsResponse> GetAppointments()
+        public async Task<AppointmentsResponse> GetAppointments(GetAppointmentsParams getAppointmentsParams)
         {
-            List<Appointment> appointments = await _getAppointmentsProvider.GetData();
+            List<Appointment> appointments = await _getAppointmentsProvider.GetData(getAppointmentsParams);
 
             foreach (var a in appointments)
             {
@@ -57,7 +57,7 @@ namespace DogGrooming.Managers.Managers
 
         public async Task<GetAppointmentDataResponse> GetAppointmentData(GetAppointmentDataParams getAppointmentDataParams)
         {
-            List<Appointment> appointments = await _getAppointmentsProvider.GetData();
+            List<Appointment> appointments = await _getAppointmentsProvider.GetData(new GetAppointmentsParams());
             List<HaircutType> haircutTypes = await _getHaircutTypesProvider.GetData();
 
             Appointment appointment = appointments.FirstOrDefault(x => x.Id == getAppointmentDataParams.AppointmentId);

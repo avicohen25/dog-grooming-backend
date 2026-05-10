@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using DogGrooming.Models;
+using DogGrooming.Models.Request;
 using DogGrooming.Providers.Contracts;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -15,7 +16,7 @@ namespace DogGrooming.Providers.Providers
             _configuration = configuration;
         }
 
-        public async Task<List<Appointment>> GetData()
+        public async Task<List<Appointment>> GetData(GetAppointmentsParams getAppointmentsParams)
         {
             List<Appointment> appointments = new List<Appointment>();
 
@@ -26,6 +27,12 @@ namespace DogGrooming.Providers.Providers
 
                 var result = await conn.QueryAsync<Appointment>(
                     "sp_getAppointments_select",
+                    new
+                    {
+                        StartDate = getAppointmentsParams.startDate,
+                        EndDate = getAppointmentsParams.endDate,
+                        UserName = getAppointmentsParams.userName
+                    },
                     commandType: CommandType.StoredProcedure
                 );
 
